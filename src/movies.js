@@ -56,8 +56,64 @@ let sortedMovies = [...moviesArray];
     return onlyTitles.slice(0, 20);
 }
 
-// BONUS - Iteration 7: Time Format - Turn duration of the movies from hours to minutes
-function turnHoursToMinutes(moviesArray) {}
+function turnHoursToMinutes(moviesArray) {
+  return moviesArray.map(movie => {
+    const durationStr = movie.duration;
+    let totalMinutes = 0;
+
+    if (typeof durationStr === 'string') {
+      const hoursMatch = durationStr.match(/(\d+)h/);
+      if (hoursMatch) {
+        totalMinutes += parseInt(hoursMatch[1], 10) * 60;
+      }
+      const minutesMatch = durationStr.match(/(\d+)min/);
+      if (minutesMatch) {
+        totalMinutes += parseInt(minutesMatch[1], 10);
+      }
+    } else if (typeof durationStr === 'number') {
+      totalMinutes = durationStr;
+    }
+
+    return {
+      ...movie,
+      duration: totalMinutes
+    };
+  });
+}
 
 // BONUS - Iteration 8: Best yearly score average - Best yearly score average
-function bestYearAvg(moviesArray) {}
+function bestYearAvg(moviesArray) {
+  if (moviesArray.length === 0) return null;
+
+  const yearsData = {};
+
+  moviesArray.forEach(movie => {
+    const year = movie.year;
+    const score = typeof movie.score === 'number' ? movie.score : 0;
+    if (!yearsData[year]) {
+      yearsData[year] = { totalScore: 0, count: 0 };
+    }
+    yearsData[year].totalScore += score;
+    yearsData[year].count += 1;
+  });
+
+  let bestYear = null;
+  let bestAvg = -Infinity;
+  for (const year in yearsData) {
+    const avg = yearsData[year].totalScore / yearsData[year].count;
+    if (avg > bestAvg) {
+      bestAvg = avg;
+      bestYear = Number(year);
+    } else if (avg === bestAvg) {
+      if (Number(year) < bestYear) {
+        bestYear = Number(year);
+      }
+    }
+  }
+
+  const formattedAvg = Number.isInteger(bestAvg)
+    ? bestAvg
+    : Number(bestAvg.toFixed(1));
+
+  return `The best year was ${bestYear} with an average score of ${formattedAvg}`;
+}
